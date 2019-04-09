@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 
 [CustomEditor(typeof(Actor))]
@@ -9,6 +10,9 @@ public class ActorEditor : Editor
     bool statsFoldout = false;
     bool attackFoldout = false;
     bool immunitiesFoldout = false;
+    int sideSelection = 0;
+    int columnSelection = 0;
+    int rowSelection = 0;
 
     public override void OnInspectorGUI()
     {
@@ -41,13 +45,155 @@ public class ActorEditor : Editor
         //Board Position
         boardFoldout = EditorGUILayout.Foldout(boardFoldout, "Board Position");
         if (boardFoldout)
-        {
-            int sideSelection = 0;
-            int columnSelection = 0;
-            int rowSelection = 0;
-            string[] sideSelections = { "Left", "Right" };
-            EditorGUILayout.LabelField("Side Selection");
-            sideSelection = GUILayout.SelectionGrid(sideSelection, sideSelections, sideSelections.Length);
+        {     
+            //Get old Board position
+            switch (newActor.boardPosition)
+            {
+                case Actor.Position.left_front_top:
+                    sideSelection = 0;
+                    columnSelection = 0;
+                    rowSelection = 0;
+                    break;
+                case Actor.Position.left_front_center:
+                    sideSelection = 0;
+                    columnSelection = 0;
+                    rowSelection = 1;
+                    break;
+                case Actor.Position.left_front_bottom:
+                    sideSelection = 0;
+                    columnSelection = 0;
+                    rowSelection = 2;
+                    break;
+                case Actor.Position.left_rear_top:
+                    sideSelection = 0;
+                    columnSelection = 1;
+                    rowSelection = 0;
+                    break;
+                case Actor.Position.left_rear_center:
+                    sideSelection = 0;
+                    columnSelection = 1;
+                    rowSelection = 1;
+                    break;
+                case Actor.Position.left_rear_bottom:
+                    sideSelection = 0;
+                    columnSelection = 1;
+                    rowSelection = 2;
+                    break;
+                case Actor.Position.right_front_top:
+                    sideSelection = 1;
+                    columnSelection = 0;
+                    rowSelection = 0;
+                    break;
+                case Actor.Position.right_front_center:
+                    sideSelection = 1;
+                    columnSelection = 0;
+                    rowSelection = 1;
+                    break;
+                case Actor.Position.right_front_bottom:
+                    sideSelection = 1;
+                    columnSelection = 0;
+                    rowSelection = 2;
+                    break;
+                case Actor.Position.right_rear_top:
+                    sideSelection = 1;
+                    columnSelection = 1;
+                    rowSelection = 0;
+                    break;
+                case Actor.Position.right_rear_center:
+                    sideSelection = 1;
+                    columnSelection = 1;
+                    rowSelection = 1;
+                    break;
+                case Actor.Position.right_rear_bottom:
+                    sideSelection = 1;
+                    columnSelection = 1;
+                    rowSelection = 2;
+                    break;
+            }
+            
+            //Side of Board
+            EditorGUILayout.LabelField("Side: ");
+            string[] sideOptions = { "Left", "Right" };
+            sideSelection = GUILayout.SelectionGrid(sideSelection, sideOptions, sideOptions.Length);
+
+            //Column of Board
+            EditorGUILayout.LabelField("Column: ");
+            string[] columnOptions = { "Front", "Rear" };
+            columnSelection = GUILayout.SelectionGrid(columnSelection, columnOptions, columnOptions.Length);
+
+            
+            //Row of Board
+            EditorGUILayout.LabelField("Row: ");
+            string[] rowOptions = { "Top", "Center", "Bottom" };
+            rowSelection = GUILayout.SelectionGrid(rowSelection, rowOptions, rowOptions.Length);
+
+            //Set new Board position
+            if (sideSelection == 0)
+            {
+                if (columnSelection == 0)
+                {
+                    if (rowSelection == 0)
+                    {
+                        newActor.boardPosition = Actor.Position.left_front_top;
+                    }
+                    else if (rowSelection == 1)
+                    {
+                        newActor.boardPosition = Actor.Position.left_front_center;
+                    }
+                    else
+                    {
+                        newActor.boardPosition = Actor.Position.left_front_bottom;
+                    }
+                }
+                else
+                {
+                    if (rowSelection == 0)
+                    {
+                        newActor.boardPosition = Actor.Position.left_rear_top;
+                    }
+                    else if (rowSelection == 1)
+                    {
+                        newActor.boardPosition = Actor.Position.left_rear_center;
+                    }
+                    else
+                    {
+                        newActor.boardPosition = Actor.Position.left_rear_bottom;
+                    }
+                }
+            }
+            else
+            {
+                if (columnSelection == 0)
+                {
+                    if (rowSelection == 0)
+                    {
+                        newActor.boardPosition = Actor.Position.right_front_top;
+                    }
+                    else if (rowSelection == 1)
+                    {
+                        newActor.boardPosition = Actor.Position.right_front_center;
+                    }
+                    else
+                    {
+                        newActor.boardPosition = Actor.Position.right_front_bottom;
+                    }
+                }
+                else
+                {
+                    if (rowSelection == 0)
+                    {
+                        newActor.boardPosition = Actor.Position.right_rear_top;
+                    }
+                    else if (rowSelection == 1)
+                    {
+                        newActor.boardPosition = Actor.Position.right_rear_center;
+                    }
+                    else
+                    {
+                        newActor.boardPosition = Actor.Position.right_rear_bottom;
+                    }
+                }
+            }
         }
 
         //Stats
@@ -138,7 +284,7 @@ public class ActorEditor : Editor
 
             //Action Effect Source
             int attackSourceSelection = 0;
-            string[] attackSourceOptions = { "Weapon", "Life", "Death", "Earth", "Air", "Water", "Fire"};
+            string[] attackSourceOptions = { "Weapon", "Life", "Death", "Fire", "Earth", "Water", "Air"};
             attackSourceSelection = EditorGUILayout.Popup("Action Effect Source", (int)newActor.actionEffectSource, attackSourceOptions);
 
             switch(attackSourceSelection)
@@ -170,7 +316,97 @@ public class ActorEditor : Editor
         immunitiesFoldout = EditorGUILayout.Foldout(immunitiesFoldout, "Immunities");
         if (immunitiesFoldout)
         {
+            //Setup variables for toggling immunities
+            bool weaponImmunity = false;
+            bool lifeImmunity = false;
+            bool deathImmunity = false;
+            bool fireImmunity = false;
+            bool earthImmunity = false;
+            bool waterImmunity = false;
+            bool airImmunity = false;
 
+            //Get current immunities
+            foreach (Actor.ActionSource currSource in newActor.immunities)
+            {
+                switch (currSource)
+                {
+                    case Actor.ActionSource.Weapon:
+                        weaponImmunity = true;
+                        break;
+                    case Actor.ActionSource.Life:
+                        lifeImmunity = true;
+                        break;
+                    case Actor.ActionSource.Death:
+                        deathImmunity = true;
+                        break;
+                    case Actor.ActionSource.Fire:
+                        fireImmunity = true;
+                        break;
+                    case Actor.ActionSource.Earth:
+                        earthImmunity = true;
+                        break;
+                    case Actor.ActionSource.Water:
+                        waterImmunity = true;
+                        break;
+                    case Actor.ActionSource.Air:
+                        airImmunity = true;
+                        break;
+                }
+            }
+
+            //Immunities
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal();
+            weaponImmunity = EditorGUILayout.ToggleLeft("Weapon", weaponImmunity, GUILayout.MaxWidth(100));
+            lifeImmunity = EditorGUILayout.ToggleLeft("Life", lifeImmunity, GUILayout.MaxWidth(100));
+            deathImmunity = EditorGUILayout.ToggleLeft("Death", deathImmunity, GUILayout.MaxWidth(100));
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            fireImmunity = EditorGUILayout.ToggleLeft("Fire", fireImmunity, GUILayout.MaxWidth(100));
+            earthImmunity = EditorGUILayout.ToggleLeft("Earth", earthImmunity, GUILayout.MaxWidth(100));
+            waterImmunity = EditorGUILayout.ToggleLeft("Water", waterImmunity, GUILayout.MaxWidth(100));
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            airImmunity = EditorGUILayout.ToggleLeft("Air", airImmunity, GUILayout.MaxWidth(100));
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+
+            //Set immunities list
+            //Create List for outputting
+            List<Actor.ActionSource> immunityOutput = new List<Actor.ActionSource>();
+
+            //Add to list
+            if(weaponImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Weapon);
+            }
+            if (lifeImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Life);
+            }
+            if (deathImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Death);
+            }
+            if (fireImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Fire);
+            }
+            if (earthImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Earth);
+            }
+            if (waterImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Water);
+            }
+            if (airImmunity)
+            {
+                immunityOutput.Add(Actor.ActionSource.Air);
+            }
+
+            //Output list
+            newActor.immunities = immunityOutput.ToArray();
         }
     }
 }
