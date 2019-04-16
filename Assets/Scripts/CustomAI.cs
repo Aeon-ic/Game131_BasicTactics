@@ -1,10 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-[System.Serializable]
+﻿[System.Serializable]
 public class CustomAI
 {
-    public string aiName;
-    public List<string> 
+    public enum HighestLowest
+    {
+        Highest,
+        Lowest
+    }
+
+    public HighestLowest highestLowest;
+    public string propertyName;
 }
