@@ -1,12 +1,21 @@
 ﻿[System.Serializable]
 public class CustomAI
 {
-    public enum HighestLowest
+    public enum HighestOrLowest
     {
         Highest,
         Lowest
     }
 
-    public HighestLowest highestLowest;
-    public string propertyName;
+    public enum Properties
+    {
+        maxHitPoints,
+        hitPoints,
+        initiative,
+        damage,
+        percentChanceToHit
+    }
+
+    public HighestOrLowest highestOrLowest;
+    public Properties propertyName;
 }

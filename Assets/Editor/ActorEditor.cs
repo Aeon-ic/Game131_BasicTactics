@@ -21,22 +21,28 @@ public class ActorEditor : Editor
         //Name field
         newActor.actorName = EditorGUILayout.TextField("Actor Name", newActor.actorName);
 
-        //Target Selection Field
-        int targetSelection = 0;
-        string[] targetSelectionOptions = { "Any Available", "Strongest Attack", "Highest Health" };
-        targetSelection = EditorGUILayout.Popup("Target Selection Rule", (int)newActor.targetSelectionRule, targetSelectionOptions);
+        //CustomAIList Field
+        newActor.customAIList = EditorGUILayout.ObjectField("Custom AI List", newActor.customAIList, typeof(CustomAIList), true) as CustomAIList;
 
-        switch (targetSelection)
+        if (newActor.customAIList == null)
         {
-            case 0:
-                newActor.targetSelectionRule = Actor.TargetSelectionRule.AnyAvailable;
-                break;
-            case 1:
-                newActor.targetSelectionRule = Actor.TargetSelectionRule.StrongestAttack;
-                break;
-            case 2:
-                newActor.targetSelectionRule = Actor.TargetSelectionRule.HighestHealth;
-                break;
+            //Target Selection Field
+            int targetSelection = 0;
+            string[] targetSelectionOptions = { "Any Available", "Strongest Attack", "Highest Health" };
+            targetSelection = EditorGUILayout.Popup("Target Selection Rule", (int)newActor.targetSelectionRule, targetSelectionOptions);
+
+            switch (targetSelection)
+            {
+                case 0:
+                    newActor.targetSelectionRule = Actor.TargetSelectionRule.AnyAvailable;
+                    break;
+                case 1:
+                    newActor.targetSelectionRule = Actor.TargetSelectionRule.StrongestAttack;
+                    break;
+                case 2:
+                    newActor.targetSelectionRule = Actor.TargetSelectionRule.HighestHealth;
+                    break;
+            }
         }
 
         //Current Target

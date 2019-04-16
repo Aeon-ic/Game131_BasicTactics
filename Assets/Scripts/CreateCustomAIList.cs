@@ -10,7 +10,7 @@ public class CreateCustomAIList : MonoBehaviour
     {
         CustomAIList asset = ScriptableObject.CreateInstance<CustomAIList>();
 
-        AssetDatabase.CreateAsset(asset, "Assets/InventoryItemList.asset");
+        AssetDatabase.CreateAsset(asset, "Assets/CustomAILists/CustomAIList.asset");
         AssetDatabase.SaveAssets();
         return asset;
     }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class Actor : MonoBehaviour {
+public class Actor : MonoBehaviour
+{
 
     #region Enums
 
@@ -11,7 +12,8 @@ public class Actor : MonoBehaviour {
     {
         AnyAvailable,
         HighestHealth,
-        StrongestAttack
+        StrongestAttack,
+        OneShot
     }
     public TargetSelectionRule targetSelectionRule;
 
@@ -86,6 +88,8 @@ public class Actor : MonoBehaviour {
 
     public Position boardPosition;
 
+    public CustomAIList customAIList;
+
     // TODO: Provide some means of configuring how the target is selected
 
     #endregion
@@ -126,30 +130,243 @@ public class Actor : MonoBehaviour {
         {
             return null;
         }
-        switch (targetSelectionRule)
+        //Check if the custom ai field has been filled
+        if (customAIList != null)
         {
-            case TargetSelectionRule.AnyAvailable:
-                return availableTargets[Random.Range(0, availableTargets.Count)];
-            case TargetSelectionRule.HighestHealth:
-                int highestHealth = 0;
-                for (int i = 0; i < availableTargets.Count; i++)
-                    if (availableTargets[i].hitPoints > highestHealth)
-                        highestHealth = availableTargets[i].hitPoints;
-                List<int> highestHealthIndexes = new List<int>();
-                for (int i = 0; i < availableTargets.Count; i++)
-                    if (availableTargets[i].hitPoints == highestHealth)
-                        highestHealthIndexes.Add(i);
-                return availableTargets[highestHealthIndexes[Random.Range(0, highestHealthIndexes.Count)]];
-            case TargetSelectionRule.StrongestAttack:
-                int highestAttack = 0;
-                for (int i = 0; i < availableTargets.Count; i++)
-                    if (availableTargets[i].damage > highestAttack)
-                        highestAttack = availableTargets[i].damage;
-                List<int> highestAttackIndexes = new List<int>();
-                for (int i = 0; i < availableTargets.Count; i++)
-                    if (availableTargets[i].damage == highestAttack)
-                        highestAttackIndexes.Add(i);
-                return availableTargets[highestAttackIndexes[Random.Range(0, highestAttackIndexes.Count)]];
+            //Loop through all the elements in the customAI List
+            for (int i = 0; i < customAIList.customAIs.Count; i++)
+            {
+                //Check whether it is to be checked vs highest or lowest
+                if (customAIList.customAIs[i].highestOrLowest == CustomAI.HighestOrLowest.Highest)
+                {
+                    int highestComparison = 0;
+                    //Get the property to be compared and get target
+                    switch (customAIList.customAIs[i].propertyName)
+                    {
+                        case CustomAI.Properties.damage:
+                            highestComparison = availableTargets[0].damage;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].damage > highestComparison)
+                                {
+                                    highestComparison = availableTargets[j].damage;
+                                }
+                            List<Actor> hDamageList = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].damage == highestComparison)
+                                {
+                                    hDamageList.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = hDamageList;
+                            break;
+
+                        case CustomAI.Properties.hitPoints:
+                            highestComparison = availableTargets[0].hitPoints;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].hitPoints > highestComparison)
+                                {
+                                    highestComparison = availableTargets[j].hitPoints;
+                                }
+                            List<Actor> hHitPoint = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].hitPoints == highestComparison)
+                                {
+                                    hHitPoint.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = hHitPoint;
+                            break;
+
+                        case CustomAI.Properties.maxHitPoints:
+                            highestComparison = availableTargets[0].maxHitPoints;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].maxHitPoints > highestComparison)
+                                {
+                                    highestComparison = availableTargets[j].maxHitPoints;
+                                }
+                            List<Actor> hMaxHitPoint = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].maxHitPoints == highestComparison)
+                                {
+                                    hMaxHitPoint.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = hMaxHitPoint;
+                            break;
+
+                        case CustomAI.Properties.initiative:
+                            highestComparison = availableTargets[0].initiative;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].initiative > highestComparison)
+                                {
+                                    highestComparison = availableTargets[j].initiative;
+                                }
+                            List<Actor> hInitiative = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].initiative == highestComparison)
+                                {
+                                    hInitiative.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = hInitiative;
+                            break;
+
+                        case CustomAI.Properties.percentChanceToHit:
+                            highestComparison = availableTargets[0].percentChanceToHit;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].percentChanceToHit > highestComparison)
+                                {
+                                    highestComparison = availableTargets[j].percentChanceToHit;
+                                }
+                            List<Actor> hPercentHit = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].percentChanceToHit == highestComparison)
+                                {
+                                    hPercentHit.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = hPercentHit;
+                            break;
+                    }
+                }
+                else if (customAIList.customAIs[i].highestOrLowest == CustomAI.HighestOrLowest.Lowest)
+                {
+                    int lowestComparsion = 0;
+                    //Get the property to be compared and get target
+                    switch (customAIList.customAIs[i].propertyName)
+                    {
+                        case CustomAI.Properties.damage:
+                            lowestComparsion = availableTargets[0].damage;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].damage < lowestComparsion)
+                                {
+                                    lowestComparsion = availableTargets[j].damage;
+                                }
+                            List<Actor> lDamage = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].damage == lowestComparsion)
+                                {
+                                    lDamage.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = lDamage;
+                            break;
+
+                        case CustomAI.Properties.hitPoints:
+                            lowestComparsion = availableTargets[0].hitPoints;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].hitPoints < lowestComparsion)
+                                {
+                                    lowestComparsion = availableTargets[j].hitPoints;
+                                }
+                            List<Actor> lHitPoint = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].hitPoints == lowestComparsion)
+                                {
+                                    lHitPoint.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = lHitPoint;
+                            break;
+
+                        case CustomAI.Properties.maxHitPoints:
+                            lowestComparsion = availableTargets[0].maxHitPoints;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].maxHitPoints < lowestComparsion)
+                                {
+                                    lowestComparsion = availableTargets[j].maxHitPoints;
+                                }
+                            List<Actor> lMaxHitPoints = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].maxHitPoints == lowestComparsion)
+                                {
+                                    lMaxHitPoints.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = lMaxHitPoints;
+                            break;
+
+                        case CustomAI.Properties.initiative:
+                            lowestComparsion = availableTargets[0].initiative;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].initiative < lowestComparsion)
+                                {
+                                    lowestComparsion = availableTargets[j].initiative;
+                                }
+                            List<Actor> lInitiative = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].initiative == lowestComparsion)
+                                {
+                                    lInitiative.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = lInitiative;
+                            break;
+
+                        case CustomAI.Properties.percentChanceToHit:
+                            lowestComparsion = availableTargets[0].percentChanceToHit;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].percentChanceToHit < lowestComparsion)
+                                {
+                                    lowestComparsion = availableTargets[j].percentChanceToHit;
+                                }
+                            List<Actor> lPercentToHit = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].percentChanceToHit == lowestComparsion)
+                                {
+                                    lPercentToHit.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = lPercentToHit;
+                            break;
+                    }
+
+                }
+            }
+            return availableTargets[Random.Range(0, availableTargets.Count)];
+        }
+        else
+        {
+            switch (targetSelectionRule)
+            {
+                case TargetSelectionRule.AnyAvailable:
+                    return availableTargets[Random.Range(0, availableTargets.Count)];
+                case TargetSelectionRule.HighestHealth:
+                    int highestHealth = 0;
+                    for (int i = 0; i < availableTargets.Count; i++)
+                        if (availableTargets[i].hitPoints > highestHealth)
+                            highestHealth = availableTargets[i].hitPoints;
+                    List<int> highestHealthIndexes = new List<int>();
+                    for (int i = 0; i < availableTargets.Count; i++)
+                        if (availableTargets[i].hitPoints == highestHealth)
+                            highestHealthIndexes.Add(i);
+                    return availableTargets[highestHealthIndexes[Random.Range(0, highestHealthIndexes.Count)]];
+                case TargetSelectionRule.StrongestAttack:
+                    int highestAttack = 0;
+                    for (int i = 0; i < availableTargets.Count; i++)
+                        if (availableTargets[i].damage > highestAttack)
+                            highestAttack = availableTargets[i].damage;
+                    List<int> highestAttackIndexes = new List<int>();
+                    for (int i = 0; i < availableTargets.Count; i++)
+                        if (availableTargets[i].damage == highestAttack)
+                            highestAttackIndexes.Add(i);
+                    return availableTargets[highestAttackIndexes[Random.Range(0, highestAttackIndexes.Count)]];
+                case TargetSelectionRule.OneShot:
+                    for (int i = 0; i < availableTargets.Count; i++)
+                        if (availableTargets[i].hitPoints < damage)
+                            return availableTargets[i];
+                    return availableTargets[Random.Range(0, availableTargets.Count)];
+            }
         }
         return availableTargets[Random.Range(0, availableTargets.Count)];
     }
@@ -231,6 +448,4 @@ public class Actor : MonoBehaviour {
     }
 
     #endregion
-
-
 }
