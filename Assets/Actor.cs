@@ -139,25 +139,54 @@ public class Actor : MonoBehaviour
                 //Check whether it is to be checked vs highest or lowest
                 if (customAIList.customAIs[i].highestOrLowest == CustomAI.HighestOrLowest.Highest)
                 {
+                    //Setup value for comparisons
                     int highestComparison = 0;
+                    float highestFloatComparison = 0;
                     //Get the property to be compared and get target
                     switch (customAIList.customAIs[i].propertyName)
                     {
                         case CustomAI.Properties.damage:
+                            //Set the highest comparison target to the first enemy
                             highestComparison = availableTargets[0].damage;
+                            //Loop through all available enemies
                             for (int j = 0; j < availableTargets.Count; j++)
-                                if (availableTargets[j].damage > highestComparison)
+                                //Check if the unit is an AoE attacker
+                                if (availableTargets[j].actionTarget == ActionTarget.AllEnemy)
                                 {
-                                    highestComparison = availableTargets[j].damage;
+                                    //Total up all the damage for the AoE attacker
+                                    if (availableTargets[j].damage * availableTargets[j].GetNumActorsOnTargetSide() > highestComparison)
+                                    {
+                                        //Set the highest comparison variable to the current attacker
+                                        highestComparison = availableTargets[j].damage;
+                                    }
                                 }
+                                //Check if the attacker is not an AoE attacker
+                                else
+                                {
+                                    //Total damage for a normal attacker
+                                    if (availableTargets[j].damage > highestComparison)
+                                    {
+                                        highestComparison = availableTargets[j].damage;
+                                    }
+                                }
+                            //Create a new list to output any ties back to the available targets list
                             List<Actor> hDamageList = new List<Actor>();
+                            //Loop through the targets again
                             for (int j = 0; j < availableTargets.Count; j++)
                             {
+                                //Check all units if they equal or tie the highest damaging unit
                                 if (availableTargets[j].damage == highestComparison)
+                                {
+                                    //Add unit to the new list for output
+                                    hDamageList.Add(availableTargets[j]);
+                                }
+                                //Same as above, but for AoE calculations
+                                if (availableTargets[j].damage * availableTargets[j].GetNumActorsOnTargetSide() == highestComparison)
                                 {
                                     hDamageList.Add(availableTargets[j]);
                                 }
                             }
+                            //Set the list of targets back into available targets
                             availableTargets = hDamageList;
                             break;
 
@@ -232,30 +261,61 @@ public class Actor : MonoBehaviour
                             }
                             availableTargets = hPercentHit;
                             break;
+
+                        case CustomAI.Properties.healthPercentageDifference:
+                            highestFloatComparison = availableTargets[0].hitPoints / availableTargets[0].maxHitPoints;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].hitPoints / availableTargets[j].maxHitPoints > highestFloatComparison)
+                                {
+                                    highestFloatComparison = availableTargets[j].hitPoints / availableTargets[j].maxHitPoints;
+                                }
+                            List<Actor> hHealthDifference = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].hitPoints / availableTargets[j].maxHitPoints == highestFloatComparison)
+                                {
+                                    hHealthDifference.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = hHealthDifference;
+                            break;
                     }
                 }
                 else if (customAIList.customAIs[i].highestOrLowest == CustomAI.HighestOrLowest.Lowest)
                 {
                     int lowestComparsion = 0;
-                    //Get the property to be compared and get target
                     switch (customAIList.customAIs[i].propertyName)
                     {
                         case CustomAI.Properties.damage:
                             lowestComparsion = availableTargets[0].damage;
                             for (int j = 0; j < availableTargets.Count; j++)
-                                if (availableTargets[j].damage < lowestComparsion)
+                                if (availableTargets[j].actionTarget == ActionTarget.AllEnemy)
                                 {
-                                    lowestComparsion = availableTargets[j].damage;
+                                    if (availableTargets[j].damage * availableTargets[j].GetNumActorsOnTargetSide() < lowestComparsion)
+                                    {
+                                        lowestComparsion = availableTargets[j].damage;
+                                    }
                                 }
-                            List<Actor> lDamage = new List<Actor>();
+                                else
+                                {
+                                    if (availableTargets[j].damage < lowestComparsion)
+                                    {
+                                        lowestComparsion = availableTargets[j].damage;
+                                    }
+                                }
+                            List<Actor> lDamageList = new List<Actor>();
                             for (int j = 0; j < availableTargets.Count; j++)
                             {
                                 if (availableTargets[j].damage == lowestComparsion)
                                 {
-                                    lDamage.Add(availableTargets[j]);
+                                    lDamageList.Add(availableTargets[j]);
+                                }
+                                if (availableTargets[j].damage * availableTargets[j].GetNumActorsOnTargetSide() == lowestComparsion)
+                                {
+                                    lDamageList.Add(availableTargets[j]);
                                 }
                             }
-                            availableTargets = lDamage;
+                            availableTargets = lDamageList;
                             break;
 
                         case CustomAI.Properties.hitPoints:
@@ -329,12 +389,32 @@ public class Actor : MonoBehaviour
                             }
                             availableTargets = lPercentToHit;
                             break;
+
+                        case CustomAI.Properties.healthPercentageDifference:
+                            lowestComparsion = availableTargets[0].hitPoints / availableTargets[0].maxHitPoints;
+                            for (int j = 0; j < availableTargets.Count; j++)
+                                if (availableTargets[j].hitPoints / availableTargets[j].maxHitPoints < lowestComparsion)
+                                {
+                                    lowestComparsion = availableTargets[j].hitPoints / availableTargets[j].maxHitPoints;
+                                }
+                            List<Actor> lHealthDifference = new List<Actor>();
+                            for (int j = 0; j < availableTargets.Count; j++)
+                            {
+                                if (availableTargets[j].hitPoints / availableTargets[j].maxHitPoints == lowestComparsion)
+                                {
+                                    lHealthDifference.Add(availableTargets[j]);
+                                }
+                            }
+                            availableTargets = lHealthDifference;
+                            break;
                     }
 
                 }
             }
+            //If there are still ties after all the loops through the custom ai list, output a random target that is in the available targets list
             return availableTargets[Random.Range(0, availableTargets.Count)];
         }
+        //If there is no custom ai list, default back to the targetSelectionRule parameter
         else
         {
             switch (targetSelectionRule)
@@ -361,6 +441,7 @@ public class Actor : MonoBehaviour
                         if (availableTargets[i].damage == highestAttack)
                             highestAttackIndexes.Add(i);
                     return availableTargets[highestAttackIndexes[Random.Range(0, highestAttackIndexes.Count)]];
+                //Added in a new case for if a unit can one shot kill something while I still add that functionality into the custom ai list
                 case TargetSelectionRule.OneShot:
                     for (int i = 0; i < availableTargets.Count; i++)
                         if (availableTargets[i].hitPoints < damage)
@@ -369,6 +450,26 @@ public class Actor : MonoBehaviour
             }
         }
         return availableTargets[Random.Range(0, availableTargets.Count)];
+    }
+
+    int GetNumActorsOnTargetSide()
+    {
+        int totalActors = 0;
+        BoardData.Line[] lines = new BoardData.Line[] { BoardData.Line.top, BoardData.Line.bottom, BoardData.Line.center };
+        BoardData.Side enemySide = MySide == BoardData.Side.left ? BoardData.Side.right : BoardData.Side.left;
+        BoardData.Side targetSide = (actionTarget.ToString().EndsWith("Enemy")) ? enemySide : MySide;
+        BoardData.Rank[] rankTargetOrder = new BoardData.Rank[] { BoardData.Rank.front, BoardData.Rank.rear };
+
+        for (int l = 0; l < lines.Length; l++)
+            for (int r = 0; r < rankTargetOrder.Length; r++)
+            {
+                Actor candidate = boardData.GetActorByPosition(targetSide, rankTargetOrder[r], lines[l]);
+                if (candidate != null)
+                {
+                    totalActors++;
+                }
+            }
+        return totalActors;
     }
 
     #region Target selection core (do not change)

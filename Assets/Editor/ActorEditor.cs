@@ -260,10 +260,10 @@ public class ActorEditor : Editor
                     newActor.actionTarget = Actor.ActionTarget.AnyEnemy;
                     break;
                 case 2:
-                    newActor.actionTarget = Actor.ActionTarget.AllEnemy;
+                    newActor.actionTarget = Actor.ActionTarget.AnyAlly;
                     break;
                 case 3:
-                    newActor.actionTarget = Actor.ActionTarget.AnyAlly;
+                    newActor.actionTarget = Actor.ActionTarget.AllEnemy;
                     break;
                 case 4:
                     newActor.actionTarget = Actor.ActionTarget.AllAlly;

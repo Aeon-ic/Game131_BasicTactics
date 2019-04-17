@@ -10,14 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9688705b6f83f674f9b5e2325717b10c, type: 3}
-  m_Name: GreatestThreat
+  m_Name: HighestHealthPercentageDifference
   m_EditorClassIdentifier: 
   customAIs:
   - highestOrLowest: 0
+    propertyName: 5
+  - highestOrLowest: 0
+    propertyName: 0
+  - highestOrLowest: 0
     propertyName: 3
-  - highestOrLowest: 0
-    propertyName: 4
-  - highestOrLowest: 0
-    propertyName: 2
-  - highestOrLowest: 1
-    propertyName: 1

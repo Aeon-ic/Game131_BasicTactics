@@ -13,7 +13,8 @@ public class CustomAI
         hitPoints,
         initiative,
         damage,
-        percentChanceToHit
+        percentChanceToHit,
+        healthPercentageDifference,
     }
 
     public HighestOrLowest highestOrLowest;

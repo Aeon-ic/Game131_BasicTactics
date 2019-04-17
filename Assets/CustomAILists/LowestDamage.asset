@@ -10,16 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9688705b6f83f674f9b5e2325717b10c, type: 3}
-  m_Name: ExampleCustomAIList
+  m_Name: LowestDamage
   m_EditorClassIdentifier: 
   customAIs:
-  - highestOrLowest: 0
-    propertyName: 0
-  - highestOrLowest: 0
-    propertyName: 1
-  - highestOrLowest: 1
-    propertyName: 2
   - highestOrLowest: 1
     propertyName: 3
-  - highestOrLowest: 0
-    propertyName: 4
